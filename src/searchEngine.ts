@@ -2,7 +2,7 @@
 
 import { LoanRecord } from "./types";
 
-const SEARCHABLE_FIELDS: Array<keyof LoanRecord> = [
+export const SEARCHABLE_FIELDS: Array<keyof LoanRecord> = [
     "recipient",
     "location",
     "lender",
@@ -16,7 +16,7 @@ function normalize(value: string): string {
     return value.toLowerCase().trim();
 }
 
-function parseQuery(query: string): { exact: boolean; term: string } {
+export function parseQuery(query: string): { exact: boolean; term: string } {
     const trimmed = query.trim();
     const quotedMatch = trimmed.match(/^['"](.+)['"]$/);
     if (quotedMatch) {
@@ -41,7 +41,7 @@ export function filterRecords(records: LoanRecord[], query: string): LoanRecord[
     const { exact, term } = parseQuery(query);
 
     if (!term) {
-        return records;
+        return [];
     }
 
     return records.filter(record =>

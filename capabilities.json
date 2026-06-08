@@ -1,4 +1,6 @@
 {
+    "supportsLandingPage": true,
+    "supportsEmptyDataView": true,
     "dataRoles": [
         { "displayName": "Recipient", "name": "recipient", "kind": "Grouping" },
         { "displayName": "Location", "name": "location", "kind": "Grouping" },
@@ -23,6 +25,17 @@
         { "displayName": "Business Age", "name": "businessAge", "kind": "Grouping" }
     ],
     "objects": {
+        "general": {
+            "properties": {
+                "selfFilter": {
+                    "type": {
+                        "filter": {
+                            "selfFilter": true
+                        }
+                    }
+                }
+            }
+        },
         "header": {
             "properties": {
                 "subtitle": {
@@ -95,7 +108,7 @@
                         { "for": { "in": "businessAge" } }
                     ],
                     "dataReductionAlgorithm": {
-                        "top": { "count": 30000 }
+                        "window": { "count": 30000 }
                     }
                 }
             }

@@ -58,7 +58,7 @@ function parseFieldValue(field: keyof LoanRecord, value: unknown): string | numb
     return formatText(value);
 }
 
-function buildRoleIndexMap(columns: powerbi.DataViewMetadataColumn[]): Map<string, number> {
+export function buildRoleIndexMap(columns: powerbi.DataViewMetadataColumn[]): Map<string, number> {
     const map = new Map<string, number>();
     columns.forEach((column, index) => {
         if (column.roles) {

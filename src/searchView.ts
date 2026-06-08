@@ -9,6 +9,8 @@ export interface SearchViewOptions {
     searchQuery: string;
     results: LoanRecord[];
     hasData: boolean;
+    hasSearched: boolean;
+    isLoading: boolean;
 }
 
 function createField(label: string, value: string, className?: string): HTMLElement {
@@ -62,7 +64,7 @@ function createResultRow(record: LoanRecord): HTMLElement {
 }
 
 export function renderSearchView(options: SearchViewOptions): void {
-    const { container, settings, searchQuery, results, hasData } = options;
+    const { container, settings, searchQuery, results, hasData, hasSearched, isLoading } = options;
     while (container.firstChild) {
         container.removeChild(container.firstChild);
     }
@@ -145,13 +147,27 @@ export function renderSearchView(options: SearchViewOptions): void {
         return;
     }
 
+    if (!hasSearched) {
+        return;
+    }
+
+    if (isLoading && results.length === 0) {
+        const loading = document.createElement("div");
+        loading.className = "search-loading";
+        loading.textContent = "Searching...";
+        container.appendChild(loading);
+        return;
+    }
+
     const summary = document.createElement("div");
     summary.className = "results-summary";
 
     const count = document.createElement("div");
     count.className = "results-count";
     const loanWord = results.length === 1 ? "loan" : "loans";
-    count.textContent = `${results.length} ${loanWord} found`;
+    count.textContent = isLoading
+        ? `Searching... ${results.length} ${loanWord} found so far`
+        : `${results.length} ${loanWord} found`;
 
     const tip = document.createElement("div");
     tip.className = "results-tip";
