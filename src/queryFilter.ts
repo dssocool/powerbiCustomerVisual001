@@ -11,7 +11,6 @@ import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
 import IFilter = powerbi.IFilter;
 
 const ADVANCED_FILTER_SCHEMA = "https://powerbi.com/product/schema#advanced";
-const SENTINEL_VALUE = "__PBI_VISUAL_INITIAL_NO_DATA__";
 
 type FilterColumnTarget = { table: string; column: string };
 type AdvancedFilterCondition = { operator: string; value: string };
@@ -71,15 +70,6 @@ function buildColumnFilter(
         logicalOperator: "And",
         conditions: [{ operator, value }]
     };
-}
-
-export function buildSentinelSelfFilter(dataView: DataView | undefined): IFilter | null {
-    const target = getSearchColumnTarget(dataView);
-    if (!target) {
-        return null;
-    }
-
-    return buildColumnFilter(target, "Contains", SENTINEL_VALUE);
 }
 
 export function buildSearchSelfFilter(dataView: DataView | undefined, query: string): IFilter | null {

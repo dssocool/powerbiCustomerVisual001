@@ -1,7 +1,11 @@
 "use strict";
 
+export function normalizeSearchInput(query: string): string {
+    return query.trim().toLowerCase();
+}
+
 function normalize(value: string): string {
-    return value.toLowerCase().trim();
+    return normalizeSearchInput(value);
 }
 
 export function parseQuery(query: string): { exact: boolean; term: string } {

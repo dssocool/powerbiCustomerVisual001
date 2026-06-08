@@ -19,7 +19,8 @@ import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 
 import { hasBoundData, parseLoanRecords } from "./dataParser";
 import { renderDetailView } from "./detailView";
-import { buildSearchSelfFilter, buildSentinelSelfFilter } from "./queryFilter";
+import { buildSearchSelfFilter } from "./queryFilter";
+import { normalizeSearchInput } from "./searchEngine";
 import { renderSearchView } from "./searchView";
 import { getVisualSettings, VisualFormattingSettingsModel } from "./settings";
 import { LoanRecord, ViewMode, VisualSettings } from "./types";
@@ -44,7 +45,6 @@ export class Visual implements IVisual {
     private lastDataView: powerbi.DataView | undefined;
     private hasSearched = false;
     private isLoading = false;
-    private initialFilterApplied = false;
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -78,7 +78,6 @@ export class Visual implements IVisual {
             this.hasData = hasBoundData(dataView);
 
             if (!this.hasSearched) {
-                this.ensureInitialFilter(dataView);
                 this.filteredRecords = [];
                 this.applyViewport(options.viewport.width, options.viewport.height);
                 this.render();
@@ -115,20 +114,6 @@ export class Visual implements IVisual {
         return this.formattingSettingsService.buildFormattingModel(this.formattingSettings);
     }
 
-    private ensureInitialFilter(dataView: powerbi.DataView | undefined): void {
-        if (this.initialFilterApplied || !this.hasData) {
-            return;
-        }
-
-        const sentinelFilter = buildSentinelSelfFilter(dataView);
-        if (!sentinelFilter) {
-            return;
-        }
-
-        this.applySelfFilter(sentinelFilter);
-        this.initialFilterApplied = true;
-    }
-
     private applySelfFilter(filter: powerbi.IFilter | null): void {
         this.host.applyJsonFilter(null, "general", "selfFilter", powerbi.FilterAction.remove);
         if (filter) {
@@ -137,17 +122,16 @@ export class Visual implements IVisual {
     }
 
     private submitSearch(query: string): void {
-        const trimmedQuery = query.trim();
-        this.searchQuery = trimmedQuery;
+        const normalizedQuery = normalizeSearchInput(query);
+        this.searchQuery = normalizedQuery;
 
-        if (!trimmedQuery) {
+        if (!normalizedQuery) {
             this.hasSearched = false;
             this.isLoading = false;
             this.allRecords = [];
             this.filteredRecords = [];
             this.lastDataSignature = "";
             this.viewMode = "search";
-            this.applySelfFilter(buildSentinelSelfFilter(this.lastDataView));
             this.render();
             return;
         }
@@ -159,7 +143,7 @@ export class Visual implements IVisual {
         this.filteredRecords = [];
         this.lastDataSignature = "";
 
-        const filter = buildSearchSelfFilter(this.lastDataView, trimmedQuery);
+        const filter = buildSearchSelfFilter(this.lastDataView, normalizedQuery);
         if (filter) {
             this.applySelfFilter(filter);
         } else {
@@ -216,7 +200,6 @@ export class Visual implements IVisual {
             }
             case "search-example": {
                 const term = actionElement.dataset.term ?? "";
-                this.searchQuery = term;
                 this.submitSearch(term);
                 break;
             }
