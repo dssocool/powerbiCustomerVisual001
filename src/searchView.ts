@@ -1,7 +1,7 @@
 "use strict";
 
 import { LoanRecord, VisualSettings } from "./types";
-import { formatCurrency, formatText } from "./formatUtils";
+import { formatText } from "./formatUtils";
 
 export interface SearchViewOptions {
     container: HTMLElement;
@@ -57,7 +57,7 @@ function createResultRow(record: LoanRecord): HTMLElement {
     row.appendChild(createRecipientField(record));
     row.appendChild(createField("Location", formatText(record.location) || "—"));
     row.appendChild(createField("Loan Status", formatText(record.loanStatus) || "—"));
-    row.appendChild(createField("Loan Amount", formatCurrency(record.loanAmount)));
+    row.appendChild(createField("Loan Amount", formatText(record.loanAmount) || "—"));
     row.appendChild(createField("Date Approved", formatText(record.dateApproved) || "—"));
 
     return row;
@@ -142,7 +142,7 @@ export function renderSearchView(options: SearchViewOptions): void {
     if (!hasData) {
         const empty = document.createElement("div");
         empty.className = "empty-state";
-        empty.textContent = "Add PPP loan fields and map Search Column to begin searching.";
+        empty.textContent = "Map Search Column (searchtext) to begin searching.";
         container.appendChild(empty);
         return;
     }

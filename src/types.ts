@@ -4,32 +4,40 @@ export type ViewMode = "search" | "detail";
 
 export interface LoanRecord {
     index: number;
+    loanNumber: string;
     recipient: string;
     location: string;
     loanStatus: string;
-    loanAmount: number | null;
+    loanAmount: string;
     dateApproved: string;
     lender: string;
-    zipCode: string;
     businessType: string;
-    amountForgiven: number | null;
+    amountForgiven: string;
     locationType: string;
     industry: string;
     dateApprovedDetail: string;
-    payroll: number | null;
-    utilities: number | null;
-    mortgageInterest: number | null;
-    healthCare: number | null;
-    rent: number | null;
-    refinanceEidl: number | null;
-    debtInterest: number | null;
-    jobsReported: number | null;
+    payroll: string;
+    utilities: string;
+    mortgageInterest: string;
+    healthCare: string;
+    rent: string;
+    refinanceEidl: string;
+    debtInterest: string;
+    jobsReported: string;
     businessAge: string;
+    payrollRaw: number | null;
+    utilitiesRaw: number | null;
+    mortgageInterestRaw: number | null;
+    healthCareRaw: number | null;
+    rentRaw: number | null;
+    refinanceEidlRaw: number | null;
+    debtInterestRaw: number | null;
 }
 
 export interface FinancialCategory {
     label: string;
-    value: number | null;
+    displayValue: string;
+    rawValue: number | null;
 }
 
 export interface VisualSettings {

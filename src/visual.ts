@@ -19,7 +19,12 @@ import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 
 import { hasBoundData, parseLoanRecords } from "./dataParser";
 import { renderDetailView } from "./detailView";
-import { buildSearchSelfFilter } from "./queryFilter";
+import {
+    buildBlockingSelfFilter,
+    buildSearchSelfFilter,
+    desiredFilterKind,
+    FilterKind
+} from "./queryFilter";
 import { normalizeSearchInput } from "./searchEngine";
 import { renderSearchView } from "./searchView";
 import { getVisualSettings, VisualFormattingSettingsModel } from "./settings";
@@ -45,6 +50,8 @@ export class Visual implements IVisual {
     private lastDataView: powerbi.DataView | undefined;
     private hasSearched = false;
     private isLoading = false;
+    private lastAppliedFilterKind: FilterKind = "none";
+    private lastAppliedSearchTerm = "";
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -78,6 +85,7 @@ export class Visual implements IVisual {
             this.hasData = hasBoundData(dataView);
 
             if (!this.hasSearched) {
+                this.ensureSelfFilter(dataView);
                 this.filteredRecords = [];
                 this.applyViewport(options.viewport.width, options.viewport.height);
                 this.render();
@@ -97,7 +105,6 @@ export class Visual implements IVisual {
                 }
             }
 
-            // Data is already filtered server-side via selfFilter; show the first batch only.
             this.filteredRecords = this.allRecords;
             this.isLoading = false;
 
@@ -114,11 +121,33 @@ export class Visual implements IVisual {
         return this.formattingSettingsService.buildFormattingModel(this.formattingSettings);
     }
 
-    private applySelfFilter(filter: powerbi.IFilter | null): void {
+    private ensureSelfFilter(dataView: powerbi.DataView | undefined): void {
+        if (!this.hasData) {
+            return;
+        }
+
+        const kind = desiredFilterKind(this.hasSearched, this.searchQuery);
+        if (kind === "block") {
+            const filter = buildBlockingSelfFilter(dataView);
+            this.applySelfFilter("block", filter);
+        }
+    }
+
+    private applySelfFilter(kind: FilterKind, filter: powerbi.IFilter | null, searchTerm = ""): void {
+        if (
+            kind === this.lastAppliedFilterKind &&
+            (kind !== "search" || searchTerm === this.lastAppliedSearchTerm)
+        ) {
+            return;
+        }
+
         this.host.applyJsonFilter(null, "general", "selfFilter", powerbi.FilterAction.remove);
         if (filter) {
             this.host.applyJsonFilter(filter, "general", "selfFilter", powerbi.FilterAction.merge);
         }
+
+        this.lastAppliedFilterKind = kind;
+        this.lastAppliedSearchTerm = searchTerm;
     }
 
     private submitSearch(query: string): void {
@@ -132,6 +161,9 @@ export class Visual implements IVisual {
             this.filteredRecords = [];
             this.lastDataSignature = "";
             this.viewMode = "search";
+
+            const blockFilter = buildBlockingSelfFilter(this.lastDataView);
+            this.applySelfFilter("block", blockFilter);
             this.render();
             return;
         }
@@ -145,7 +177,7 @@ export class Visual implements IVisual {
 
         const filter = buildSearchSelfFilter(this.lastDataView, normalizedQuery);
         if (filter) {
-            this.applySelfFilter(filter);
+            this.applySelfFilter("search", filter, normalizedQuery);
         } else {
             this.isLoading = false;
         }
@@ -235,6 +267,6 @@ export class Visual implements IVisual {
         }
         const first = records[0];
         const last = records[records.length - 1];
-        return `${records.length}|${first.recipient}|${last.recipient}`;
+        return `${records.length}|${first.loanNumber}|${last.loanNumber}`;
     }
 }

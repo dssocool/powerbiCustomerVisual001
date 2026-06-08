@@ -2,27 +2,6 @@
     "supportsLandingPage": true,
     "supportsEmptyDataView": true,
     "dataRoles": [
-        { "displayName": "Recipient", "name": "recipient", "kind": "Grouping" },
-        { "displayName": "Location", "name": "location", "kind": "Grouping" },
-        { "displayName": "Loan Status", "name": "loanStatus", "kind": "Grouping" },
-        { "displayName": "Loan Amount", "name": "loanAmount", "kind": "Measure" },
-        { "displayName": "Date Approved", "name": "dateApproved", "kind": "Grouping" },
-        { "displayName": "Lender", "name": "lender", "kind": "Grouping" },
-        { "displayName": "Zip Code", "name": "zipCode", "kind": "Grouping" },
-        { "displayName": "Business Type", "name": "businessType", "kind": "Grouping" },
-        { "displayName": "Amount Forgiven", "name": "amountForgiven", "kind": "Measure" },
-        { "displayName": "Location Type", "name": "locationType", "kind": "Grouping" },
-        { "displayName": "Industry", "name": "industry", "kind": "Grouping" },
-        { "displayName": "Date Approved Detail", "name": "dateApprovedDetail", "kind": "Grouping" },
-        { "displayName": "Payroll", "name": "payroll", "kind": "Measure" },
-        { "displayName": "Utilities", "name": "utilities", "kind": "Measure" },
-        { "displayName": "Mortgage Interest", "name": "mortgageInterest", "kind": "Measure" },
-        { "displayName": "Health Care", "name": "healthCare", "kind": "Measure" },
-        { "displayName": "Rent", "name": "rent", "kind": "Measure" },
-        { "displayName": "Refinance EIDL", "name": "refinanceEidl", "kind": "Measure" },
-        { "displayName": "Debt Interest", "name": "debtInterest", "kind": "Measure" },
-        { "displayName": "Jobs Reported", "name": "jobsReported", "kind": "Measure" },
-        { "displayName": "Business Age", "name": "businessAge", "kind": "Grouping" },
         { "displayName": "Search Column", "name": "searchColumn", "kind": "Grouping" }
     ],
     "objects": {
@@ -86,31 +65,10 @@
             "table": {
                 "rows": {
                     "select": [
-                        { "for": { "in": "recipient" } },
-                        { "for": { "in": "location" } },
-                        { "for": { "in": "loanStatus" } },
-                        { "for": { "in": "loanAmount" } },
-                        { "for": { "in": "dateApproved" } },
-                        { "for": { "in": "lender" } },
-                        { "for": { "in": "zipCode" } },
-                        { "for": { "in": "businessType" } },
-                        { "for": { "in": "amountForgiven" } },
-                        { "for": { "in": "locationType" } },
-                        { "for": { "in": "industry" } },
-                        { "for": { "in": "dateApprovedDetail" } },
-                        { "for": { "in": "payroll" } },
-                        { "for": { "in": "utilities" } },
-                        { "for": { "in": "mortgageInterest" } },
-                        { "for": { "in": "healthCare" } },
-                        { "for": { "in": "rent" } },
-                        { "for": { "in": "refinanceEidl" } },
-                        { "for": { "in": "debtInterest" } },
-                        { "for": { "in": "jobsReported" } },
-                        { "for": { "in": "businessAge" } },
                         { "for": { "in": "searchColumn" } }
                     ],
                     "dataReductionAlgorithm": {
-                        "window": { "count": 1 }
+                        "window": { "count": 300 }
                     }
                 }
             }

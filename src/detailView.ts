@@ -1,7 +1,7 @@
 "use strict";
 
 import { FinancialCategory, LoanRecord } from "./types";
-import { formatCurrency, formatNumber, formatText } from "./formatUtils";
+import { formatText } from "./formatUtils";
 
 export interface DetailViewOptions {
     container: HTMLElement;
@@ -52,13 +52,13 @@ function createInfoField(label: string, value: string): HTMLElement {
 
 function getFinancialCategories(record: LoanRecord): FinancialCategory[] {
     return [
-        { label: "Payroll", value: record.payroll },
-        { label: "Utilities", value: record.utilities },
-        { label: "Mortgage Interest", value: record.mortgageInterest },
-        { label: "Health Care", value: record.healthCare },
-        { label: "Rent", value: record.rent },
-        { label: "Refinance EIDL", value: record.refinanceEidl },
-        { label: "Debt Interest", value: record.debtInterest }
+        { label: "Payroll", displayValue: record.payroll, rawValue: record.payrollRaw },
+        { label: "Utilities", displayValue: record.utilities, rawValue: record.utilitiesRaw },
+        { label: "Mortgage Interest", displayValue: record.mortgageInterest, rawValue: record.mortgageInterestRaw },
+        { label: "Health Care", displayValue: record.healthCare, rawValue: record.healthCareRaw },
+        { label: "Rent", displayValue: record.rent, rawValue: record.rentRaw },
+        { label: "Refinance EIDL", displayValue: record.refinanceEidl, rawValue: record.refinanceEidlRaw },
+        { label: "Debt Interest", displayValue: record.debtInterest, rawValue: record.debtInterestRaw }
     ];
 }
 
@@ -67,7 +67,7 @@ function findHighlightIndex(categories: FinancialCategory[]): number {
     let maxValue = -1;
 
     categories.forEach((category, index) => {
-        const value = category.value ?? 0;
+        const value = category.rawValue ?? 0;
         if (value > maxValue) {
             maxValue = value;
             maxIndex = index;
@@ -115,8 +115,8 @@ export function renderDetailView(options: DetailViewOptions): void {
 
     const dateDetail = formatText(record.dateApprovedDetail) || formatText(record.dateApproved) || "—";
 
-    metrics.appendChild(createMetricField("Loan Amount", formatCurrency(record.loanAmount)));
-    metrics.appendChild(createMetricField("Amount Forgiven", formatCurrency(record.amountForgiven), "Includes any accrued interest"));
+    metrics.appendChild(createMetricField("Loan Amount", formatText(record.loanAmount) || "—"));
+    metrics.appendChild(createMetricField("Amount Forgiven", formatText(record.amountForgiven) || "—", "Includes any accrued interest"));
     metrics.appendChild(createMetricField("Location", formatText(record.location) || "—", formatText(record.locationType) || undefined));
     metrics.appendChild(createMetricField("Industry", formatText(record.industry) || "—"));
     metrics.appendChild(createMetricField("Date Approved", dateDetail));
@@ -153,7 +153,7 @@ export function renderDetailView(options: DetailViewOptions): void {
 
         const amount = document.createElement("span");
         amount.className = "financial-amount";
-        amount.textContent = formatCurrency(category.value);
+        amount.textContent = formatText(category.displayValue) || "—";
 
         row.appendChild(name);
         row.appendChild(amount);
@@ -167,7 +167,7 @@ export function renderDetailView(options: DetailViewOptions): void {
     rightColumn.className = "detail-right";
 
     rightColumn.appendChild(createInfoField("Lender", formatText(record.lender) || "—"));
-    rightColumn.appendChild(createInfoField("Jobs Reported", formatNumber(record.jobsReported)));
+    rightColumn.appendChild(createInfoField("Jobs Reported", formatText(record.jobsReported) || "—"));
     rightColumn.appendChild(createInfoField("Business Type", formatText(record.businessType) || "—"));
     rightColumn.appendChild(createInfoField("Business Age", formatText(record.businessAge) || "—"));
     rightColumn.appendChild(createInfoField("Loan Status", formatText(record.loanStatus) || "—"));
