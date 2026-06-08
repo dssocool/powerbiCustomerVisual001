@@ -22,7 +22,8 @@
         { "displayName": "Refinance EIDL", "name": "refinanceEidl", "kind": "Measure" },
         { "displayName": "Debt Interest", "name": "debtInterest", "kind": "Measure" },
         { "displayName": "Jobs Reported", "name": "jobsReported", "kind": "Measure" },
-        { "displayName": "Business Age", "name": "businessAge", "kind": "Grouping" }
+        { "displayName": "Business Age", "name": "businessAge", "kind": "Grouping" },
+        { "displayName": "Search Column", "name": "searchColumn", "kind": "Grouping" }
     ],
     "objects": {
         "general": {
@@ -105,7 +106,8 @@
                         { "for": { "in": "refinanceEidl" } },
                         { "for": { "in": "debtInterest" } },
                         { "for": { "in": "jobsReported" } },
-                        { "for": { "in": "businessAge" } }
+                        { "for": { "in": "businessAge" } },
+                        { "for": { "in": "searchColumn" } }
                     ],
                     "dataReductionAlgorithm": {
                         "window": { "count": 500 }

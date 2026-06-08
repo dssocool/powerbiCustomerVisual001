@@ -110,5 +110,5 @@ export function hasBoundData(dataView: DataView | undefined): boolean {
         return false;
     }
     const roleIndex = buildRoleIndexMap(dataView.table.columns);
-    return roleIndex.has("recipient");
+    return roleIndex.has("recipient") && roleIndex.has("searchColumn");
 }

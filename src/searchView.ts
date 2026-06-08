@@ -142,7 +142,7 @@ export function renderSearchView(options: SearchViewOptions): void {
     if (!hasData) {
         const empty = document.createElement("div");
         empty.className = "empty-state";
-        empty.textContent = "Add PPP loan fields to the visual to begin searching.";
+        empty.textContent = "Add PPP loan fields and map Search Column to begin searching.";
         container.appendChild(empty);
         return;
     }

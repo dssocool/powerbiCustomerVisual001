@@ -2,7 +2,9 @@
 
 import powerbi from "powerbi-visuals-api";
 import { buildRoleIndexMap } from "./dataParser";
-import { parseQuery, SEARCHABLE_FIELDS } from "./searchEngine";
+import { parseQuery } from "./searchEngine";
+
+const SEARCH_COLUMN_ROLE = "searchColumn";
 
 import DataView = powerbi.DataView;
 import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
@@ -43,27 +45,18 @@ function getColumnTarget(column: DataViewMetadataColumn): FilterColumnTarget | n
     };
 }
 
-function getSearchableTargets(dataView: DataView | undefined): FilterColumnTarget[] {
+function getSearchColumnTarget(dataView: DataView | undefined): FilterColumnTarget | null {
     if (!dataView?.table?.columns?.length) {
-        return [];
+        return null;
     }
 
     const roleIndex = buildRoleIndexMap(dataView.table.columns);
-    const targets: FilterColumnTarget[] = [];
+    const colIndex = roleIndex.get(SEARCH_COLUMN_ROLE);
+    if (colIndex === undefined) {
+        return null;
+    }
 
-    SEARCHABLE_FIELDS.forEach(role => {
-        const colIndex = roleIndex.get(role);
-        if (colIndex === undefined) {
-            return;
-        }
-
-        const target = getColumnTarget(dataView.table.columns[colIndex]);
-        if (target) {
-            targets.push(target);
-        }
-    });
-
-    return targets;
+    return getColumnTarget(dataView.table.columns[colIndex]);
 }
 
 function buildColumnFilter(
@@ -81,12 +74,12 @@ function buildColumnFilter(
 }
 
 export function buildSentinelSelfFilter(dataView: DataView | undefined): IFilter | null {
-    const targets = getSearchableTargets(dataView);
-    if (targets.length === 0) {
+    const target = getSearchColumnTarget(dataView);
+    if (!target) {
         return null;
     }
 
-    return buildColumnFilter(targets[0], "Contains", SENTINEL_VALUE);
+    return buildColumnFilter(target, "Contains", SENTINEL_VALUE);
 }
 
 export function buildSearchSelfFilter(dataView: DataView | undefined, query: string): IFilter | null {
@@ -95,21 +88,10 @@ export function buildSearchSelfFilter(dataView: DataView | undefined, query: str
         return null;
     }
 
-    const targets = getSearchableTargets(dataView);
-    if (targets.length === 0) {
+    const target = getSearchColumnTarget(dataView);
+    if (!target) {
         return null;
     }
 
-    const operator = exact ? "Is" : "Contains";
-
-    if (targets.length === 1) {
-        return buildColumnFilter(targets[0], operator, term);
-    }
-
-    return {
-        $schema: ADVANCED_FILTER_SCHEMA,
-        filterType: 0,
-        logicalOperator: "Or",
-        conditions: targets.map(target => buildColumnFilter(target, operator, term))
-    };
+    return buildColumnFilter(target, exact ? "Is" : "Contains", term);
 }
