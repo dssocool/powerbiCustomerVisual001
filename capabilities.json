@@ -110,7 +110,7 @@
                         { "for": { "in": "searchColumn" } }
                     ],
                     "dataReductionAlgorithm": {
-                        "window": { "count": 500 }
+                        "window": { "count": 1 }
                     }
                 }
             }
