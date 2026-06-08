@@ -1,0 +1,26 @@
+{
+    "visual": {
+        "name": "powerbiCustomerVisual001",
+        "displayName": "powerbiCustomerVisual001",
+        "guid": "powerbiCustomerVisual001E3B64FAD25F24A4A8059CFF4863E691B",
+        "visualClassName": "Visual",
+        "version": "1.0.0.0",
+        "description": "Just a test visual.",
+        "supportUrl": "https://dummy.com",
+        "gitHubUrl": ""
+    },
+    "apiVersion": "5.3.0",
+    "author": {
+        "name": "Huang Yi",
+        "email": "yi.huang0306@gmail.com"
+    },
+    "assets": {
+        "icon": "assets/icon.png"
+    },
+    "externalJS": null,
+    "style": "style/visual.less",
+    "capabilities": "capabilities.json",
+    "dependencies": null,
+    "stringResources": [],
+    "version": "1.0.0.0"
+}
