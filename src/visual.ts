@@ -20,7 +20,6 @@ import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import { hasBoundData, parseLoanRecords } from "./dataParser";
 import { renderDetailView } from "./detailView";
 import { buildSearchSelfFilter, buildSentinelSelfFilter } from "./queryFilter";
-import { filterRecords } from "./searchEngine";
 import { renderSearchView } from "./searchView";
 import { getVisualSettings, VisualFormattingSettingsModel } from "./settings";
 import { LoanRecord, ViewMode, VisualSettings } from "./types";
@@ -99,8 +98,9 @@ export class Visual implements IVisual {
                 }
             }
 
-            this.filteredRecords = filterRecords(this.allRecords, this.searchQuery);
-            this.continueFetchingIfNeeded(dataView);
+            // Data is already filtered server-side via selfFilter; show the first batch only.
+            this.filteredRecords = this.allRecords;
+            this.isLoading = false;
 
             this.applyViewport(options.viewport.width, options.viewport.height);
             this.render();
@@ -125,23 +125,15 @@ export class Visual implements IVisual {
             return;
         }
 
-        this.host.applyJsonFilter(
-            sentinelFilter,
-            "general",
-            "selfFilter",
-            powerbi.FilterAction.merge
-        );
+        this.applySelfFilter(sentinelFilter);
         this.initialFilterApplied = true;
     }
 
-    private continueFetchingIfNeeded(dataView: powerbi.DataView | undefined): void {
-        if (dataView?.metadata?.segment) {
-            this.isLoading = true;
-            this.host.fetchMoreData(true);
-            return;
+    private applySelfFilter(filter: powerbi.IFilter | null): void {
+        this.host.applyJsonFilter(null, "general", "selfFilter", powerbi.FilterAction.remove);
+        if (filter) {
+            this.host.applyJsonFilter(filter, "general", "selfFilter", powerbi.FilterAction.merge);
         }
-
-        this.isLoading = false;
     }
 
     private submitSearch(query: string): void {
@@ -155,6 +147,7 @@ export class Visual implements IVisual {
             this.filteredRecords = [];
             this.lastDataSignature = "";
             this.viewMode = "search";
+            this.applySelfFilter(buildSentinelSelfFilter(this.lastDataView));
             this.render();
             return;
         }
@@ -168,12 +161,7 @@ export class Visual implements IVisual {
 
         const filter = buildSearchSelfFilter(this.lastDataView, trimmedQuery);
         if (filter) {
-            this.host.applyJsonFilter(
-                filter,
-                "general",
-                "selfFilter",
-                powerbi.FilterAction.merge
-            );
+            this.applySelfFilter(filter);
         } else {
             this.isLoading = false;
         }

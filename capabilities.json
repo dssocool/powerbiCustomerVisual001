@@ -108,7 +108,7 @@
                         { "for": { "in": "businessAge" } }
                     ],
                     "dataReductionAlgorithm": {
-                        "window": { "count": 30000 }
+                        "window": { "count": 500 }
                     }
                 }
             }

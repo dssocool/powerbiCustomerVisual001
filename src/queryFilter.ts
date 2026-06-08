@@ -28,9 +28,19 @@ function getColumnTarget(column: DataViewMetadataColumn): FilterColumnTarget | n
         return null;
     }
 
-    const dotIndex = queryName.indexOf(".");
-    const table = dotIndex >= 0 ? queryName.substring(0, dotIndex) : queryName;
-    return { table, column: column.displayName };
+    // queryName is typically "Table.Column" (or wrapped in an aggregation, e.g. "Sum(Table.Column)")
+    const innerMatch = queryName.match(/\(([^)]+)\)/);
+    const path = innerMatch ? innerMatch[1] : queryName;
+    const dotIndex = path.indexOf(".");
+
+    if (dotIndex < 0) {
+        return { table: path, column: column.displayName };
+    }
+
+    return {
+        table: path.substring(0, dotIndex),
+        column: path.substring(dotIndex + 1)
+    };
 }
 
 function getSearchableTargets(dataView: DataView | undefined): FilterColumnTarget[] {
